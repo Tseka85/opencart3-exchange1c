@@ -1,5 +1,4 @@
 <?php
-//include 'ChromePhp.php';
 
 class ControllerExtensionModuleExchange1c extends Controller {
 	private $error = array();
@@ -2909,7 +2908,7 @@ class ControllerExtensionModuleExchange1c extends Controller {
 		$zip->addFile(DIR_APPLICATION . 'language/en-gb/extension/module/exchange1c.php', 'upload/admin/language/en-gb/extension/module/exchange1c.php');
 		$zip->addFile(DIR_APPLICATION . 'language/ru-ru/extension/module/exchange1c.php', 'upload/admin/language/ru-ru/extension/module/exchange1c.php');
 		$zip->addFile(DIR_APPLICATION . 'model/extension/exchange1c.php', 'upload/admin/model/extension/exchange1c.php');
-		$zip->addFile(DIR_APPLICATION . 'view/template/extension/module/exchange1c.tpl', 'upload/admin/view/template/extension/module/exchange1c.tpl');
+		$zip->addFile(DIR_APPLICATION . 'view/template/extension/module/exchange1c.twig', 'upload/admin/view/template/extension/module/exchange1c.twig');
 		$zip->addFile(DIR_APPLICATION . '../export/exchange1c.php', 'upload/export/exchange1c.php');
 		$zip->addFile(DIR_APPLICATION . '../export/exchange1c_cron.php', 'upload/export/exchange1c_cron.php');
 		$zip->addFile(DIR_APPLICATION . '../bitrix/admin/1c_exchange.php', 'upload/bitrix/admin/1c_exchange.php');
