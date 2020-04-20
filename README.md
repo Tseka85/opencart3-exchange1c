@@ -1,5 +1,5 @@
 
-            Модуль opencart2-exchange1c от автора KirilLoveVE https://github.com/KirilLoveVE адаптирован мной для OPENCART 3.x
+   #  Модуль opencart2-exchange1c от автора KirilLoveVE https://github.com/KirilLoveVE адаптирован мной для OPENCART 3.x
 
 Версия 1.6.4.7(ver.2_BagFix_SEO 1)
 # Модуль обмена с 1С v8.x для Opencart 3.x
@@ -39,12 +39,9 @@
 # Поддержка CMS
 * OpenCart 3.х
 
-OpenCart 3.x
 # PHP
 * 7.х
 
-PHP
-7.x
 # Поддержка 1С
 * Управление торговлей 10 (!)
 * Управление торговлей 11 (!)
