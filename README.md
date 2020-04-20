@@ -1,5 +1,8 @@
 
-   #  Модуль opencart2-exchange1c от автора KirilLoveVE https://github.com/KirilLoveVE адаптирован мной для OPENCART 3.x
+   #  Модуль opencart2-exchange1c от автора KirilLoveVE адаптирован мной для OPENCART 3.x
+   
+   Источник :  https://github.com/KirilLoveVE 
+   
 
 Версия 1.6.4.7(ver.2_BagFix_SEO 1)
 # Модуль обмена с 1С v8.x для Opencart 3.x
