@@ -243,7 +243,7 @@ class ModelExtensionExchange1c extends Model {
 		$this->query('TRUNCATE TABLE `' . DB_PREFIX . 'order_option`');
 		$this->query('TRUNCATE TABLE `' . DB_PREFIX . 'option`');
 		$this->query('TRUNCATE TABLE `' . DB_PREFIX . 'option_to_product`');
-		$this->query('DELETE FROM `' . DB_PREFIX . 'url_alias` WHERE `query` LIKE "product_id=%"');
+		$this->query('DELETE FROM `' . DB_PREFIX . 'seo_url` WHERE `query` LIKE "product_id=%"');
 		$result .=  "Опции товаров\n";
 
 		// Очищает таблицы категорий
@@ -254,7 +254,7 @@ class ModelExtensionExchange1c extends Model {
 		$this->query('TRUNCATE TABLE ' . DB_PREFIX . 'category_to_layout');
 		$this->query('TRUNCATE TABLE ' . DB_PREFIX . 'category_path');
 		$this->query('TRUNCATE TABLE ' . DB_PREFIX . 'category_to_1c');
-		$this->query('DELETE FROM `' . DB_PREFIX . 'url_alias` WHERE `query` LIKE "category_id=%"');
+		$this->query('DELETE FROM `' . DB_PREFIX . 'seo_url` WHERE `query` LIKE "category_id=%"');
 		$result .=  "Категории\n";
 
   		// Очищает таблицы от всех производителей
@@ -267,7 +267,7 @@ class ModelExtensionExchange1c extends Model {
 			$this->query('TRUNCATE TABLE ' . DB_PREFIX . 'manufacturer_description');
 		}
 		$this->query('TRUNCATE TABLE ' . DB_PREFIX . 'manufacturer_to_store');
-		$this->query('DELETE FROM `' . DB_PREFIX . 'url_alias` WHERE `query` LIKE "manufacturer_id=%"');
+		$this->query('DELETE FROM `' . DB_PREFIX . 'seo_url` WHERE `query` LIKE "manufacturer_id=%"');
 		$result .=  "Производители\n";
 
 		// Очищает атрибуты
@@ -396,7 +396,7 @@ class ModelExtensionExchange1c extends Model {
 		if ($query->num_rows) {
 
 			foreach ($query->rows as $product_info) {
-				$query_url = $this->query("SELECT `url_alias_id` FROM `" .  DB_PREFIX . "url_alias` WHERE `query` = 'product_id=" . $product_info['product_id'] . "' ORDER BY `keyword`");
+				$query_url = $this->query("SELECT `seo_url_id` FROM `" .  DB_PREFIX . "seo_url` WHERE `query` = 'product_id=" . $product_info['product_id'] . "' ORDER BY `keyword`");
 
 				if ($query_url->num_rows > 1) {
 					$this->log("У товара product_id=" . $product_info['product_id'] . " найдено " . $query_url->num_rows . " SEO URL записей!");
@@ -406,7 +406,7 @@ class ModelExtensionExchange1c extends Model {
 					$num = 1;
 					foreach ($query_url->rows as $url_info) {
 						if ($num < $query_url->num_rows) {
-							$this->query("DELETE FROM `" . DB_PREFIX . "url_alias` WHERE `url_alias_id` = " . $url_info['url_alias_id']);
+							$this->query("DELETE FROM `" . DB_PREFIX . "seo_url` WHERE `seo_url_id` = " . $url_info['seo_url_id']);
 							$this->log("Удалена запись " . $num);
 							$product_doubles_total++;
 						}
@@ -424,7 +424,7 @@ class ModelExtensionExchange1c extends Model {
 		if ($query->num_rows) {
 
 			foreach ($query->rows as $category_info) {
-				$query_url = $this->query("SELECT `url_alias_id` FROM `" .  DB_PREFIX . "url_alias` WHERE `query` = 'category_id=" . $category_info['category_id'] . "' ORDER BY `keyword`");
+				$query_url = $this->query("SELECT `seo_url_id` FROM `" .  DB_PREFIX . "seo_url` WHERE `query` = 'category_id=" . $category_info['category_id'] . "' ORDER BY `keyword`");
 
 				if ($query_url->num_rows > 1) {
 					$this->log("У категории category_id=" . $category_info['category_id'] . " найдено " . $query_url->num_rows . " SEO URL записей!");
@@ -434,7 +434,7 @@ class ModelExtensionExchange1c extends Model {
 					$num = 1;
 					foreach ($query_url->rows as $url_info) {
 						if ($num < $query_url->num_rows) {
-							$this->query("DELETE FROM `" . DB_PREFIX . "url_alias` WHERE `url_alias_id` = " . $url_info['url_alias_id']);
+							$this->query("DELETE FROM `" . DB_PREFIX . "seo_url` WHERE `seo_url_id` = " . $url_info['seo_url_id']);
 							$this->log("Удалена запись " . $num);
 							$category_doubles_total++;
 						}
@@ -742,13 +742,13 @@ class ModelExtensionExchange1c extends Model {
 	private function getSeoUrl($element, $id, $last_symbol = "") {
 
     	$result = array(
-   			'url_alias_id'	=> 0,
+   			'seo_url_id'	=> 0,
    			'keyword'		=> ""
 		);
-		$query = $this->query("SELECT `url_alias_id`,`keyword` FROM `" . DB_PREFIX . "url_alias` WHERE `query` = '" . $element . "=" . (string)$id . "'");
+		$query = $this->query("SELECT `seo_url_id`,`keyword` FROM `" . DB_PREFIX . "seo_url` WHERE `query` = '" . $element . "=" . (string)$id . "'");
     	if ($query->num_rows) {
     		$result = array(
-    			'url_alias_id'	=> $query->row['url_alias_id'],
+    			'seo_url_id'	=> $query->row['seo_url_id'],
     			'keyword'		=> $query->row['keyword'] . $last_symbol
 			);
     		return $result;
@@ -777,9 +777,9 @@ class ModelExtensionExchange1c extends Model {
 
 		// Получим все названия начинающиеся на $element_name
 		$keywords = array();
-		$query = $this->query("SELECT `url_alias_id`,`keyword` FROM `" . DB_PREFIX . "url_alias` WHERE `query` <> '" . $url_type . "=" . $element_id . "' AND `keyword` LIKE '" . $this->db->escape($keyword) . "-%'");
+		$query = $this->query("SELECT `seo_url_id`,`keyword` FROM `" . DB_PREFIX . "seo_url` WHERE `query` <> '" . $url_type . "=" . $element_id . "' AND `keyword` LIKE '" . $this->db->escape($keyword) . "-%'");
 		foreach ($query->rows as $row) {
-			$keywords[$row['url_alias_id']] = $row['keyword'];
+			$keywords[$row['seo_url_id']] = $row['keyword'];
 		}
 		// Проверим на дубли
 		$key = array_search($keyword, $keywords);
@@ -797,13 +797,13 @@ class ModelExtensionExchange1c extends Model {
 		}
 
 		// Обновляем если только были изменения и существует запись
-		if ($old_element['keyword'] != $keyword && $old_element['url_alias_id']) {
+		if ($old_element['keyword'] != $keyword && $old_element['seo_url_id']) {
 
-			$this->query("UPDATE `" . DB_PREFIX . "url_alias` SET `keyword` = '" . $this->db->escape($keyword) . "' WHERE `url_alias_id` = " . $old_element['url_alias_id']);
+			$this->query("UPDATE `" . DB_PREFIX . "seo_url` SET `keyword` = '" . $this->db->escape($keyword) . "' WHERE `seo_url_id` = " . $old_element['seo_url_id']);
 
 		} else {
 
-			$this->query("INSERT INTO `" . DB_PREFIX . "url_alias` SET `query` = '" . $url_type . "=" . $element_id ."', `keyword` = '" . $this->db->escape($keyword) . "'");
+			$this->query("INSERT INTO `" . DB_PREFIX . "seo_url` SET `query` = '" . $url_type . "=" . $element_id ."', `keyword` = '" . $this->db->escape($keyword) . "'");
 
 		}
 
@@ -3333,8 +3333,8 @@ class ModelExtensionExchange1c extends Model {
 
 		// Настройки фильтров значений свойств
 		$types = $this->config->get("exchange1c_product_property_type_no_import");
-
-		if (count($types) == 3) {
+        $count = count((array) $types);
+		if ($count == 3) {
 			$this->errorLog(2040);
 			return 0;
 		}
@@ -4968,7 +4968,7 @@ class ModelExtensionExchange1c extends Model {
 				}
 
 			} else {
-				// Добавим цену в настройку если он ане помечена на удаление
+				// Добавим цену в настройку если она не помечена на удаление
 				if ($default_price == -1) {
 					$table_price = "product";
 					$default_price = count($config_price_type)+1;
@@ -7524,7 +7524,7 @@ class ModelExtensionExchange1c extends Model {
 		$this->query("INSERT INTO `" . DB_PREFIX . "category_to_1c` SET `category_id` = '" . (int)$category_id . "', `guid` = '" . $this->db->escape($data['guid']) . "', `version` = '" . $this->db->escape($data['version']) . "'");
 
 		if (isset($data['keyword'])) {
-			$this->db->query("INSERT INTO " . DB_PREFIX . "url_alias SET query = 'category_id=" . (int)$category_id . "', keyword = '" . $this->db->escape($data['keyword']) . "'");
+			$this->db->query("INSERT INTO " . DB_PREFIX . "seo_url SET query = 'category_id=" . (int)$category_id . "', keyword = '" . $this->db->escape($data['keyword']) . "'");
 		}
 
 		// Магазин
@@ -7869,8 +7869,8 @@ class ModelExtensionExchange1c extends Model {
 			if ($this->ERROR) return false;
 
 			unset($xml->Свойства);
-
-			$this->log("Атрибутов загружено: " . count($num), 2);
+            $count = count((array) $num);
+			$this->log("Атрибутов загружено: " . $count, 2);
 
 		}
 
@@ -8148,7 +8148,7 @@ class ModelExtensionExchange1c extends Model {
 			'cart'						=> array('product_feature_id'=>0),
 			'attributes_value'			=> array(),
 			'attributes_value_to_1c'	=> array(),
-			'url_alias'					=> array('seomanager'=>'')
+			'seo_url'					=> array('seomanager'=>'')
 		);
 
 		foreach ($tables as $table => $fields) {
