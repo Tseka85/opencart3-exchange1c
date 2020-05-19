@@ -61,26 +61,33 @@ if ($config->get('exchange1c_log_filename')) {
 }
 $registry->set('log', $log);
 
-// ДЛЯ ОТЛАДКИ АВТОРИЗАЦИИ
-//$server_info = print_r($_SERVER, true);
-//$log->write($server_info);
+$config->set('session_engine', 'file');
+//$config->set('session_autostart', true);
+//$config->set('session_name', 'OCSESSID');
 
-// Используются только для отладки (начало)
-//$log->write("Client IP address: " . $_SERVER['REMOTE_ADDR']);
-//if (isset($remote_user))
-//	$log->write("remote_user: " . $remote_user);
-//
-//if (isset($_SERVER['PHP_AUTH_USER']))
-//	$log->write("PHP_AUTH_USER: " . $_SERVER['PHP_AUTH_USER']);
-//
-//if (isset($_SERVER['REMOTE_USER']))
-//	$log->write("REMOTE_USER: " . $_SERVER['REMOTE_USER']);
-//
-//if (isset($_SERVER['REDIRECT_REMOTE_USER']))
-//	$log->write("REDIRECT_REMOTE_USER: " . $_SERVER['REDIRECT_REMOTE_USER']);
-//
-//if (isset($_SERVER['PHP_AUTH_PW']))
-//	$log->write("PHP_AUTH_PW: " . $_SERVER['PHP_AUTH_PW']);
+// ДЛЯ ОТЛАДКИ АВТОРИЗАЦИИ
+// $server_info = print_r($_SERVER, true);
+// $log->write($server_info);
+
+// //Используются только для отладки (начало)
+// $log->write("Client IP address: " . $_SERVER['REMOTE_ADDR']);
+// if (isset($remote_user))
+// 	$log->write("remote_user: " . $remote_user);
+
+// if (isset($_SERVER['PHP_AUTH_USER']))
+// 	$log->write("PHP_AUTH_USER: " . $_SERVER['PHP_AUTH_USER']);
+
+// if (isset($_SERVER['REMOTE_USER']))
+// 	$log->write("REMOTE_USER: " . $_SERVER['REMOTE_USER']);
+
+// if (isset($_SERVER['REDIRECT_REMOTE_USER']))
+// 	$log->write("REDIRECT_REMOTE_USER: " . $_SERVER['REDIRECT_REMOTE_USER']);
+
+// if (isset($_SERVER['PHP_AUTH_PW']))
+// 	$log->write("PHP_AUTH_PW: " . $_SERVER['PHP_AUTH_PW']);
+
+// $log->write("SESSION ENGINE: " . $config->get('session_engine'));
+// $log->write("CONFIG STORE ID: " . $config->get('config_store_id'));
 // Используются только для отладки (конец)
 
 // Error Handler
@@ -130,7 +137,12 @@ $response->addHeader('Content-Type: text/html; charset=utf-8');
 $registry->set('response', $response);
 
 // Session
-$registry->set('session', new Session());
+//$registry->set('session', new Session($config->get('session_engine'), $registry));
+
+
+$session = new Session($config->get('session_engine'), $registry);
+$session->start();
+$registry->set('session', $session);
 
 // Cache
 $registry->set('cache', new Cache('file'));
@@ -180,7 +192,7 @@ $event = new Event($registry);
 $registry->set('event', $event);
 
 // Front Controller
-$controller = new Front($registry);
+$controller = new Router($registry);
 
 // Информация используется для поиска и отладки возможных ошибок в beta версиях
 //$sapi = php_sapi_name();

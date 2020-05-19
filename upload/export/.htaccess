@@ -1,0 +1,2 @@
+RewriteCond %{HTTP:Authorization} ^Basic.*
+RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]
