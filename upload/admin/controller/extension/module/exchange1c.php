@@ -2349,7 +2349,8 @@ class ControllerExtensionModuleExchange1c extends Controller {
 		if ($data !== false) {
 
 			// Записываем в файл
-			$filesize = file_put_contents($uplod_file, $data, FILE_APPEND | LOCK_EX);
+			//$filesize = file_put_contents($uplod_file, $data, FILE_APPEND | LOCK_EX); //эта строчка кода приводила к увеличению картинки в размере при каждой загрузке
+			$filesize = file_put_contents($uplod_file, $data, LOCK_EX);
 			$this->log("file size: " . $filesize, 2);
 
 			if ($filesize) {
