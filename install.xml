@@ -1,13 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <modification>
 	<name>Exchange1C Module for OpenCart 3 (no official) </name>
-	<version>1.6.4.7(ver.2_BagFix_SEO 1)</version>
+	<version>1.6.4.7(ver.2_BagFix_SEO 1 + gmp-mod_v6)</version>
 	<id>OpenCart Exchange1C</id> 
 	<author>KirilLoveVE</author>
 	<link>https://github.com/Tseka85/opencart3-exchange1c</link>
 	<code>exchange1c</code>
 	<file path="admin/controller/common/column_left.php">
-		<operation>
-			<search><![CDATA[if ($this->user->hasPermission('access', 'extension/event')) {]]></search>
+		<operation error="skip">
+			<search><![CDATA[if ($extension) {]]></search>
 			<add position="before"><![CDATA[			if ($this->user->hasPermission('access', 'extension/module/exchange1c')) {
 				$extension[] = array(
 					'name'	   => 'Exchange 1C v8.x',
@@ -18,22 +19,25 @@
 ]]></add>
 		</operation>
 	</file>
+
 	<file path="admin/model/sale/order.php">
-		<operation>
+		<operation error="skip">
 			<search><![CDATA['lastname'                => $order_query->row['lastname'],]]></search>
 			<add position="after"><![CDATA[				'middlename'              => $order_query->row['middlename'],]]></add>
 		</operation>
 	</file>
+
 	<file path="admin/controller/sale/order.php">
-		<operation>
+		<operation error="skip">
 			<search><![CDATA[$data['lastname'] = $order_info['lastname'];]]></search>
 			<add position="after"><![CDATA[			$data['middlename'] = $order_info['middlename'];]]></add>
 		</operation>
 	</file>
-	<file path="admin/view/template/sale/order_info.tpl">
-		<operation>
-			<search><![CDATA[<?php echo $firstname; ?> <?php echo $lastname; ?>]]></search>
-			<add position="replace"><![CDATA[<?php echo $firstname; ?> <?php echo $lastname; ?>  <?php echo $middlename; ?>]]></add>
+
+	<file path="admin/view/template/sale/order_info.twig">
+		<operation error="skip">
+			<search><![CDATA[{{ firstname }} {{ lastname }}]]></search>
+			<add position="replace"><![CDATA[{{ firstname }} {{ lastname }}  {{ middlename }}]]></add>
 		</operation>
 	</file>
 
