@@ -308,7 +308,7 @@ class ModelExtensionExchange1c extends Model {
 
 
 	/**
-	 * Возвращает информацию о синхронизированных объектов с 1С товарок, категорий, атрибутов
+	 * Возвращает информацию о синхронизированных с 1С объектах: товарах, категориях, производителях, атрибутах
 	 * Вызывается из контроллера, index()
 	 */
 	public function linksInfo() {
@@ -2276,7 +2276,14 @@ class ModelExtensionExchange1c extends Model {
 			$data['image'] = 'no_image.png';
 		}
 
-		// Сверим что нужно обновдять
+		// Удаляем кеш основного изображения товара, 
+		// необходимо если основное изображение товара изменилось, но имя файла осталось прежним
+		if ($this->config->get('exchange1c_product_images_cache_clean') == 1 && $this->config->get('exchange1c_product_images_no_import') != 1) {
+			$image_info = pathinfo(DIR_IMAGE . $old_data['image']);
+			$this->deleteCacheImage($image_info);
+		}
+
+		// Сверим что нужно обновлять
 		$modify_fields1 = $this->compareArraysData($data, $old_data, $no_update);
 
 		// Формируем SEO для товара и получаем поля которые изменились
@@ -3333,8 +3340,8 @@ class ModelExtensionExchange1c extends Model {
 
 		// Настройки фильтров значений свойств
 		$types = $this->config->get("exchange1c_product_property_type_no_import");
-        $count = count((array) $types);
-		if ($count == 3) {
+
+		if (count($types) == 3) {
 			$this->errorLog(2040);
 			return 0;
 		}
@@ -4532,6 +4539,8 @@ class ModelExtensionExchange1c extends Model {
 			// МОДЕЛЬ
 			if ($product->Модель) {
 				$data['model'] = htmlspecialchars(trim((string)$product->Модель));
+			} else {
+				$data['model'] = $product->Артикул ? htmlspecialchars(trim((string)$product->Артикул)) : "-";
 			}
 
 			// НАИМЕНОВАНИЕ
@@ -5535,7 +5544,7 @@ class ModelExtensionExchange1c extends Model {
 				if ($query->num_rows) {
 					$product_option_id = $query->row['product_option_id'];
 				} else {
-					$this->query("INSERT INTO `" . DB_PREFIX . "product_option` SET `product_id` = " . $product_id . ", `option_id` = " . $option_id);
+					$this->query("INSERT INTO `" . DB_PREFIX . "product_option` SET `product_id` = " . $product_id . ", `option_id` = " . $option_id . ", `required` = 1");
 					$product_option_id = $this->db->getLastId();
 				}
 
@@ -5578,7 +5587,7 @@ class ModelExtensionExchange1c extends Model {
 	 */
 	private function parseOffers($xml) {
 
-		$this->log("~Начало разбора предложений");
+		$this->log("~Начало разбора предложений", 0);
 
 		if (!$xml->Предложение) {
 			$this->log("parseOffers(): Пустое предложение, пропущено");
@@ -5841,7 +5850,7 @@ class ModelExtensionExchange1c extends Model {
 
 		$this->logStat('offers');
 
-		$this->log("Загружено предложений " . $num_offer . " из " . $count_offers);
+		$this->log("Загружено предложений " . $num_offer . " из " . $count_offers, 0);
 
 		return $num_offer;
 
@@ -7869,8 +7878,8 @@ class ModelExtensionExchange1c extends Model {
 			if ($this->ERROR) return false;
 
 			unset($xml->Свойства);
-            $count = count((array) $num);
-			$this->log("Атрибутов загружено: " . $count, 2);
+
+			$this->log("Атрибутов загружено: " . count($num), 2);
 
 		}
 
@@ -8008,7 +8017,7 @@ class ModelExtensionExchange1c extends Model {
 
 		// Функция будет сама определять что за файл загружается
 		$this->STAT['exchange'] = microtime(true);
-		$this->log("~НАЧАЛО ЗАГРУЗКИ ДАННЫХ");
+		$this->log("~НАЧАЛО ЗАГРУЗКИ ДАННЫХ", 0);
 		//$this->log("Доступно памяти: " . sprintf("%.3f", memory_get_peak_usage() / 1024 / 1024) . " Mb", 2);
 
 		// Определим язык
@@ -8093,9 +8102,9 @@ class ModelExtensionExchange1c extends Model {
 			$this->log($xml,2);
 		}
 
-		$this->log("~КОНЕЦ ЗАГРУЗКИ ДАННЫХ");
+		$this->log("~КОНЕЦ ЗАГРУЗКИ ДАННЫХ", 0);
 		$this->logStat('exchange');
-		$this->log($this->STAT, 2);
+		$this->log($this->STAT, 0);
 		$this->setConfig('stat_'.$filename, json_encode($this->STAT), 1, 'exchange1c-stat');
 		return "";
 
@@ -8183,10 +8192,10 @@ class ModelExtensionExchange1c extends Model {
 		if (isset($settings['exchange1c_version'])) {
 			$version = $settings['exchange1c_version'];
 		} else {
-			$version = '1.6.4.1';
+			$version = '1.6.4.7';
 			$settings['exchange1c_version'] = $version;
 		}
-		$version = "1.6.4.1";
+
 		$beta = '';
 
 		if ($version == '1.6.4.1') {
@@ -8195,56 +8204,62 @@ class ModelExtensionExchange1c extends Model {
 	        if ($this->ERROR) return false;
 	   		if ($success) {
 	   			$version = '1.6.4.2';
-	   			$message .= "Успешно обновлено до версии " . $version;
+				$message .= " Успешно обновлено до версии " . $version;
 			}
 		}
+
 		if ($version == '1.6.4.2') {
 			$this->log("Обновление до версии 1.6.4.3...'");
 			$success = $this->update_1_6_4_3();
 	        if ($this->ERROR) return false;
 	   		if ($success) {
 	   			$version = '1.6.4.3';
-	   			$message .= "Успешно обновлено до версии " . $version;
+				$message .= " Успешно обновлено до версии " . $version;
 			}
 		}
+
 		if ($version == '1.6.4.3') {
 			$this->log("Обновление до версии 1.6.4.4...'");
 			$success = $this->update_1_6_4_4();
 	        if ($this->ERROR) return false;
 	   		if ($success) {
 	   			$version = '1.6.4.4';
-	   			$message .= "Успешно обновлено до версии " . $version;
+				$message .= " Успешно обновлено до версии " . $version;
 			}
 		}
+
 		if (version_compare($version, '1.6.4.4', '=')) {
 			$this->log("Обновление до версии 1.6.4.5...'");
 			$success = $this->update_1_6_4_5();
 		        if ($this->ERROR) return false;
 		   	if ($success) {
 		   		$version = '1.6.4.5';
-		   		$message .= "Успешно обновлено до версии " . $version;
+				$message .= " Успешно обновлено до версии " . $version;
 			}
 		}
+
 		if (version_compare($version, '1.6.4.5', '=')) {
 			$this->log("Обновление до версии 1.6.4.6...'");
 			$success = $this->update_1_6_4_6();
 		        if ($this->ERROR) return false;
 		   	if ($success) {
 		   		$version = '1.6.4.6';
-		   		$message .= "Успешно обновлено до версии " . $version;
+				$message .= " Успешно обновлено до версии " . $version;
 			}
 		}
+
 		if (version_compare($version, '1.6.4.6', '=')) {
 			$this->log("Обновление до версии 1.6.4.7...'");
 			$success = $this->update_1_6_4_7();
 		        if ($this->ERROR) return false;
 		   	if ($success) {
 		   		$version = '1.6.4.7';
-		   		$message .= "Успешно обновлено до версии " . $version;
+				$message .= " Успешно обновлено до версии " . $version;
 			}
 		}
 
 		$pos = strrpos($version, 'b');
+
 		if ($beta) {
 			$old_version = $version;
 			if ($pos === false) {
@@ -8253,7 +8268,7 @@ class ModelExtensionExchange1c extends Model {
 				$version = substr($version, 0, $pos) . 'b' . $beta;
 			}
 			if ($old_version != $version)
-				$message .= ($message ? '<br />' : '') . 'Обновление до beta версии ' . $version;
+				$message .= ($message ? '<br />' : '') . ' Обновление до beta версии ' . $version;
 		} else {
 			if ($pos !== false) {
 				$version = substr($version, 0, $pos);
@@ -8264,7 +8279,7 @@ class ModelExtensionExchange1c extends Model {
 			//$this->setEvents();
 			$settings['exchange1c_version'] = $version;
 			$this->model_setting_setting->editSetting('exchange1c', $settings);
-			$message .= '<br /><strong>ВНИМАНИЕ! после обновления необходимо проверить все настройки и сохранить!</strong>';
+			$message .= '<br><strong>ВНИМАНИЕ! после обновления необходимо проверить все настройки и сохранить!</strong>';
 		}
 
 		return $message;
