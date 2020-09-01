@@ -1,5 +1,7 @@
 <?php
 
+ini_set('max_execution_time', 900);
+
 // Configuration
 require_once('../admin/config.php');
 
@@ -69,21 +71,21 @@ $config->set('session_engine', 'file');
 // $server_info = print_r($_SERVER, true);
 // $log->write($server_info);
 
-// //Используются только для отладки (начало)
-// $log->write("Client IP address: " . $_SERVER['REMOTE_ADDR']);
-// if (isset($remote_user))
+// Используются только для отладки (начало)
+//$log->write("Client IP address: " . $_SERVER['REMOTE_ADDR']);
+//if (isset($remote_user))
 // 	$log->write("remote_user: " . $remote_user);
-
-// if (isset($_SERVER['PHP_AUTH_USER']))
+//
+//if (isset($_SERVER['PHP_AUTH_USER']))
 // 	$log->write("PHP_AUTH_USER: " . $_SERVER['PHP_AUTH_USER']);
-
-// if (isset($_SERVER['REMOTE_USER']))
+//
+//if (isset($_SERVER['REMOTE_USER']))
 // 	$log->write("REMOTE_USER: " . $_SERVER['REMOTE_USER']);
-
-// if (isset($_SERVER['REDIRECT_REMOTE_USER']))
+//
+//if (isset($_SERVER['REDIRECT_REMOTE_USER']))
 // 	$log->write("REDIRECT_REMOTE_USER: " . $_SERVER['REDIRECT_REMOTE_USER']);
-
-// if (isset($_SERVER['PHP_AUTH_PW']))
+//
+//if (isset($_SERVER['PHP_AUTH_PW']))
 // 	$log->write("PHP_AUTH_PW: " . $_SERVER['PHP_AUTH_PW']);
 
 // $log->write("SESSION ENGINE: " . $config->get('session_engine'));
@@ -205,8 +207,16 @@ $controller = new Router($registry);
 //else
 //	$log->write('Запуск веб сервера в режиме модуля сервера '.$sapi);
 
-// Router
+// Лог запросов со стороны 1С
+$request_url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$log->write('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+$log->write($request_url);
 
+//$request_cookie = print_r($_COOKIE, true);
+//$log->write('$_COOKIE:');
+//$log->write($request_cookie);
+
+// Router
 if (isset($request->get['mode']) && $request->get['type'] == 'catalog') {
 
 	switch ($request->get['mode']) {
