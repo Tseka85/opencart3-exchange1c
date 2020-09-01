@@ -4,7 +4,7 @@
    Источник :  https://github.com/KirilLoveVE 
    
 
-Версия 1.6.4.7(ver.2_BagFix_SEO 1)
+Версия 1.6.4.7(ver.2_BagFix_SEO 1 + gmp-mod_v6)
 # Модуль обмена с 1С v8.x для Opencart 3.x
 * Обрабатывает XML от 2.04 до 2.10
 
