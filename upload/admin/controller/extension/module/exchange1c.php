@@ -1,6 +1,4 @@
 <?php
-//include 'ChromePhp.php';
-
 class ControllerExtensionModuleExchange1c extends Controller {
 	private $error = array();
 	private $module_name = 'Exchange 1C 8.x';
@@ -13,6 +11,11 @@ class ControllerExtensionModuleExchange1c extends Controller {
 	 * @param	string,object	Сообщение или объект
 	 */
 	private function log($message, $level=1) {
+		if ($level == 0) {
+				$this->log->write(print_r($message,true));
+			return;
+		}
+
 		if ($this->config->get('exchange1c_log_level') >= $level) {
 
 			if ($level == 1) {
@@ -39,21 +42,33 @@ class ControllerExtensionModuleExchange1c extends Controller {
 	 * Выводит сообщение
 	 */
 	private function echo_message($ok, $message="") {
-		if ($ok) {
+		switch ($ok) {
+			case 1:
 			echo "success\n";
 			$this->log("success",2);
 			if ($message) {
 				echo $message;
 				$this->log($message,2);
 			}
-		} else {
+				break;
+
+			case 2:
+				echo "progress\n";
+				$this->log("progress",2);
+				if ($message) {
+					echo $message;
+					$this->log($message,2);
+				}
+				break;
+
+			default:
 			echo "failure\n";
 			$this->log("failure",2);
 			if ($message) {
 				echo $message;
 				$this->log($message,2);
 			}
-		};
+		}
 	} // echo_message()
 
 
@@ -160,7 +175,9 @@ class ControllerExtensionModuleExchange1c extends Controller {
 	 */
 	private function htmlRadio($name, $param) {
 
-		$value = $this->getParam($name);
+		$default = isset($param['default']) ? $param['default'] : '';
+
+		$value = $this->getParam($name, $default);
 
 		if (!$value) $value = "0";
 
@@ -325,7 +342,6 @@ class ControllerExtensionModuleExchange1c extends Controller {
 	 * Основная функция
 	 */
 	public function index($refresh = false) {
-		//ChromePhp::log('Hello console!');
 
 		$data['lang'] = $this->load->language('extension/module/exchange1c');
 
@@ -365,14 +381,14 @@ class ControllerExtensionModuleExchange1c extends Controller {
 			//$settings = $this->model_setting_setting->getSetting('exchange1c');
 		}
 
-
 		if (isset($settings['exchange1c_version'])) {
 			$data['version'] = $settings['exchange1c_version'];
 		} else {
 			$data['version'] = "0.0.0.0";
-			$this->error['warning'] = "Модуль не установлен! Включите модуль!";
+			$this->error['warning'] = "<strong>Модуль не установлен, установите модуль! (Дополнения -> Модули -> Обмен данными с 1C v8.x -> Установить)</strong>";
 			$this->log("Обнаружен первый вход в админку");
 		}
+
 		$data['url_connect'] = HTTP_CATALOG . "export/exchange1c.php";
 
 		$data['exchange1c_config_icon'] = $this->getParam('config_icon');
@@ -888,11 +904,13 @@ class ControllerExtensionModuleExchange1c extends Controller {
 		$data['upload_max_filesize'] = ini_get('upload_max_filesize');
 		$data['post_max_size'] = ini_get('post_max_size');
 
+		if (isset($settings['exchange1c_version'])) {
 		$links_info = $this->model_extension_exchange1c->linksInfo();
 		$data['links_product_info'] = $links_info['product_to_1c'];
 		$data['links_category_info'] = $links_info['category_to_1c'];
 		$data['links_manufacturer_info'] = $links_info['manufacturer_to_1c'];
 		$data['links_attribute_info'] = $links_info['attribute_to_1c'];
+		}
 
 	 	// информация о памяти
 		$data['memory_limit'] = ini_get('memory_limit');
@@ -947,6 +965,7 @@ class ControllerExtensionModuleExchange1c extends Controller {
 		$settings['exchange1c_seo_manufacturer'] 			= '[manufacturer]';
 		$settings['exchange1c_seo_sku'] 					= '[sku]';
 		$settings['exchange1c_table_fields']				= $this->model_extension_exchange1c->defineTableFields();
+		$settings['exchange1c_log_filename']				= 'exchange1c.log';
 
 		$this->model_setting_setting->editSetting('exchange1c', $settings);
 
@@ -959,6 +978,12 @@ class ControllerExtensionModuleExchange1c extends Controller {
 //				'name'		=> $this->module_name
 //			)
 //		);
+
+ 		// Добавим отчество плательщика в заказ
+		$result = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "order` WHERE `field` = 'middlename'");
+		if (!$result->num_rows) {
+			$this->db->query("ALTER TABLE  `" . DB_PREFIX . "order` ADD `middlename` VARCHAR ( 32 ) NOT NULL AFTER `lastname`");
+		}
 
 		// Общее количество теперь можно хранить не только целое число (для совместимости)
 		// Увеличиваем точность поля веса до тысячных
@@ -1169,10 +1194,10 @@ class ControllerExtensionModuleExchange1c extends Controller {
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8"
 		);
 
-		$this->log("Проверка обновлений ...");
+		//$this->log("Проверка обновлений ...");
 		//$message .= $this->model_extension_exchange1c->checkUpdates($settings);
 
-		$this->log->write("Включен модуль " . $this->module_name . " версии " . $settings['exchange1c_version']);
+		$this->log->write("Установлен модуль " . $this->module_name . " версии " . $settings['exchange1c_version']);
 		$this->log->write($message);
 
 	} // install()
@@ -2349,7 +2374,6 @@ class ControllerExtensionModuleExchange1c extends Controller {
 		if ($data !== false) {
 
 			// Записываем в файл
-			//$filesize = file_put_contents($uplod_file, $data, FILE_APPEND | LOCK_EX); //эта строчка кода приводила к увеличению картинки в размере при каждой загрузке
 			$filesize = file_put_contents($uplod_file, $data, LOCK_EX);
 			$this->log("file size: " . $filesize, 2);
 
