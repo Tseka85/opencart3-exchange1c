@@ -3341,7 +3341,8 @@ class ModelExtensionExchange1c extends Model {
 		// Настройки фильтров значений свойств
 		$types = $this->config->get("exchange1c_product_property_type_no_import");
 
-		if (count($types) == 3) {
+		$count = count((array) $types);
+		if ($count == 3) {
 			$this->errorLog(2040);
 			return 0;
 		}
@@ -7879,8 +7880,8 @@ class ModelExtensionExchange1c extends Model {
 
 			unset($xml->Свойства);
 
-			$this->log("Атрибутов загружено: " . count($num), 2);
-
+			$count = count((array) $num);
+			$this->log("Атрибутов загружено: " . $count, 2);
 		}
 
 		// Товарные категории
