@@ -105,7 +105,7 @@ class ControllerExtensionModuleExchange1c extends Controller {
 
 //			var_dump("<pre>"); var_dump($this->config->get('exchange1c_'.$param)); var_dump("</pre>");
 
-			if ($this->config->get('exchange1c_'.$param)) {
+			if ($this->config->get('exchange1c_'.$param) !== null) {
 				return $this->config->get('exchange1c_'.$param);
 			}
 
