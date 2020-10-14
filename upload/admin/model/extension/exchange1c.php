@@ -765,6 +765,9 @@ class ModelExtensionExchange1c extends Model {
 	 */
 	private function setSeoURL($url_type, $element_id, $element_name, $old_element) {
 
+		$language_id = $this->getLanguageId($this->config->get('config_language'));
+		$store_id = $this->config->get('config_store_id');
+
 		if (empty($old_element['keyword']) && empty($element_name)) {
 			$this->log("ВНИМАНИЕ! старое и новое значение SEO URL пустое!");
 			return false;
@@ -799,11 +802,11 @@ class ModelExtensionExchange1c extends Model {
 		// Обновляем если только были изменения и существует запись
 		if ($old_element['keyword'] != $keyword && $old_element['seo_url_id']) {
 
-			$this->query("UPDATE `" . DB_PREFIX . "seo_url` SET `keyword` = '" . $this->db->escape($keyword) . "' WHERE `seo_url_id` = " . $old_element['seo_url_id']);
+			$this->query("UPDATE `" . DB_PREFIX . "seo_url` SET `keyword` = '" . $this->db->escape($keyword) . "', `store_id` = '" . $store_id . "', `languag_id` = '" . $languag_id . "' WHERE `seo_url_id` = " . $old_element['seo_url_id']);
 
 		} else {
 
-			$this->query("INSERT INTO `" . DB_PREFIX . "seo_url` SET `query` = '" . $url_type . "=" . $element_id ."', `keyword` = '" . $this->db->escape($keyword) . "'");
+			$this->query("INSERT INTO `" . DB_PREFIX . "seo_url` SET `query` = '" . $url_type . "=" . $element_id ."', `store_id` = '" . $store_id . "', `languag_id` = '" . $languag_id . "', `keyword` = '" . $this->db->escape($keyword) . "'");
 
 		}
 
@@ -7882,6 +7885,7 @@ class ModelExtensionExchange1c extends Model {
 
 			$count = count((array) $num);
 			$this->log("Атрибутов загружено: " . $count, 2);
+
 		}
 
 		// Товарные категории
