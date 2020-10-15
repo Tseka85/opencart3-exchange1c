@@ -802,11 +802,11 @@ class ModelExtensionExchange1c extends Model {
 		// Обновляем если только были изменения и существует запись
 		if ($old_element['keyword'] != $keyword && $old_element['seo_url_id']) {
 
-			$this->query("UPDATE `" . DB_PREFIX . "seo_url` SET `keyword` = '" . $this->db->escape($keyword) . "', `store_id` = '" . $store_id . "', `languag_id` = '" . $language_id . "' WHERE `seo_url_id` = " . $old_element['seo_url_id']);
+			$this->query("UPDATE `" . DB_PREFIX . "seo_url` SET `keyword` = '" . $this->db->escape($keyword) . "', `store_id` = '" . $store_id . "', `language_id` = '" . $language_id . "' WHERE `seo_url_id` = " . $old_element['seo_url_id']);
 
 		} else {
 
-			$this->query("INSERT INTO `" . DB_PREFIX . "seo_url` SET `query` = '" . $url_type . "=" . $element_id ."', `store_id` = '" . $store_id . "', `languag_id` = '" . $language_id . "', `keyword` = '" . $this->db->escape($keyword) . "'");
+			$this->query("INSERT INTO `" . DB_PREFIX . "seo_url` SET `query` = '" . $url_type . "=" . $element_id ."', `store_id` = '" . $store_id . "', `language_id` = '" . $language_id . "', `keyword` = '" . $this->db->escape($keyword) . "'");
 
 		}
 
