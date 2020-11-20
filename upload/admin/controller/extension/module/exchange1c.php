@@ -1909,6 +1909,16 @@ class ControllerExtensionModuleExchange1c extends Controller {
 		}
 
 		zip_close($zipArc);
+		
+		// Удаляет архив из временной папки после распаковки.
+		if ($this->config->get('exchange1c_not_delete_files_after_import') != 1) {
+			if (unlink($zipFile))	{
+				$this->log("Удален архив " . $zipFile);
+			}else{
+				$this->log("Ошибка удаления архива " . $zipFile);
+			}
+		}
+		
 		$this->log("Получены XML файлы:", 2);
 		$this->log($xmlFiles, 2);
 		return $xmlFiles;
@@ -2374,7 +2384,8 @@ class ControllerExtensionModuleExchange1c extends Controller {
 		if ($data !== false) {
 
 			// Записываем в файл
-			$filesize = file_put_contents($uplod_file, $data, LOCK_EX);
+			//$filesize = file_put_contents($uplod_file, $data, LOCK_EX);
+			$filesize = file_put_contents($uplod_file, $data, FILE_APPEND | LOCK_EX);
 			$this->log("file size: " . $filesize, 2);
 
 			if ($filesize) {
