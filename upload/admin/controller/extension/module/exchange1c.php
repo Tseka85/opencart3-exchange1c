@@ -364,7 +364,7 @@ class ControllerExtensionModuleExchange1c extends Controller {
 			$settings['exchange1c_CMS_version'] = VERSION;
 			$settings['exchange1c_table_fields'] = $this->model_extension_exchange1c->defineTableFields();
 
-			$this->model_setting_setting->editSetting('exchange1c', $settings);
+			$this->model_setting_setting->editSetting('module_exchange1c', $settings);
 			$this->session->data['success'] = $this->language->get('text_success');
 
 			if (!$refresh) {
