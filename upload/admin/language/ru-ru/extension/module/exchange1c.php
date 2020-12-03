@@ -20,7 +20,7 @@ $_['text_browse']										= 'Обзор';
 $_['text_clear']										= 'Очистить';
 $_['text_homepage']										= 'Домашняя страничка модуля';
 $_['text_source_code']									= 'Исходный код на GitHub';
-$_['text_change']										= 'Доработка и поддержка: Кириллов Виталий (Skype: KirilLoveVE, ICQ: 39927648, Viber: +79144306000, email: vitaly.kirillove@mail.ru)';
+$_['text_change']										= 'Доработка и поддержка: <a href="https://opencartforum.com/topic/60560-podderzhka-modul-obmena-dlya-opencart-v23-s-uchetnoy-sistemoy-po-standartu-commerceml/">[Поддержка] Модуль обмена для opencart v2.3 с учетной системой по стандарту CommerceML</a>';
 $_['text_date_order']									= 'Дата заказа';
 $_['text_date_exchange']								= 'Дата обмена';
 $_['text_index']										= 'Индекс';
