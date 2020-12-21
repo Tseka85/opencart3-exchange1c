@@ -5113,7 +5113,7 @@ class ModelExtensionExchange1c extends Model {
 			foreach ($xml->Цена as $price_data) {
 
 				$guid	= (string)$price_data->ИдТипаЦены;
-				$price	= $price_data->ЦенаЗаЕдиницу ? (float)$price_data->ЦенаЗаЕдиницу : 0;
+				$price	= $price_data->ЦенаЗаЕдиницу ? (float)str_replace(',', '.', $price_data->ЦенаЗаЕдиницу) : 0;
 
 				if ($config_price_type['guid'] != $guid) {
 					continue;
