@@ -6380,7 +6380,7 @@ class ModelExtensionExchange1c extends Model {
 			$to_date = date('Y-m-d H:i:s');
 
 			// Этот запрос будет использовать индексы поля date_modified
-			$query = $this->query("SELECT `order_id`,`order_status_id` FROM `" . DB_PREFIX . "order` WHERE `date_modified` BETWEEN STR_TO_DATE('" . $from_date . "', '%Y-%m-%d %H:%i:%s') AND STR_TO_DATE('" . $to_date . "', '%Y-%m-%d %H:%i:%s')");
+			$query = $this->query("SELECT `order_id`,`order_status_id` FROM `" . DB_PREFIX . "order` WHERE `date_modified` BETWEEN STR_TO_DATE('" . $from_date . "', '%Y-%m-%d %H:%i:%s') AND STR_TO_DATE('" . $to_date . "', '%Y-%m-%d %H:%i:%s') AND `order_status_id` != 0");
 
 			if ($query->num_rows) {
 				foreach ($query->rows as $row) {
