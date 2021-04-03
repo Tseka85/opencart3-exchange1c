@@ -186,9 +186,6 @@ $registry->set('length', new Cart\Length($registry));
 // User
 $registry->set('user', new Cart\User($registry));
 
-//OpenBay Pro
-$registry->set('openbay', new Openbay($registry));
-
 // Event
 $event = new Event($registry);
 $registry->set('event', $event);
