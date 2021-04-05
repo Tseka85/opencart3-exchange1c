@@ -851,7 +851,7 @@ class ModelExtensionExchange1c extends Model {
 		foreach ($query->rows as $category) {
 			$categories[] = $category['name'];
 		}
-		$cat_string = implode(',', $categories);
+		$cat_string = implode(', ', $categories);
 		return $cat_string;
 
       } // getProductCategoriesString()
