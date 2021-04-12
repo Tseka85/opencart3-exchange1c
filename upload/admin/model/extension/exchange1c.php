@@ -5182,13 +5182,37 @@ class ModelExtensionExchange1c extends Model {
 						// Поищем старую цену
 						foreach ($old_prices['discount'] as $old_price) {
 							if ($old_price['customer_group_id'] == $config_price_type['customer_group_id']) {
-								if ($old_price['price'] != $price) {
+
+								if (isset($old_price['price'])) {
+
 									$this->query("UPDATE `" . DB_PREFIX . "product_discount` SET `price` = '" . $price . "' WHERE `product_discount_id` = '" . $old_price['product_discount_id'] . "'");
+								}
+							
+                                                        }else {
+                                                                // Все текущие скидки выбранного товара
+								$discounts =array_column($old_prices['discount'], 'customer_group_id');
+
+								if (isset($old_price['price'])) {
+
+									if (in_array($config_price_type['customer_group_id'], $discounts)) {
+
+										$this->query("UPDATE `" . DB_PREFIX . "product_discount` SET `price` = '" . $price . "', `customer_group_id` = '" . (int)$old_price['customer_group_id'] . "' WHERE `product_discount_id` = '" . $old_price['product_discount_id'] . "'AND `customer_group_id` = '" . (int)$config_price_type['customer_group_id'] ."'");
+
+									}else {
+
+										$this->query("INSERT INTO `" . DB_PREFIX . "product_discount` SET `product_id` = " . (int)$product_id . ", `quantity` = " . (float)$config_price_type['quantity'] . ", `priority` = " . (int)$config_price_type['priority'] . ", `customer_group_id` = " . (int)$config_price_type['customer_group_id'] . ", `price` = '" . (float)$price . "'");
+
+									}
 								}
 							}
 						}
 						$this->log("Цена скидки '" . $config_price_type['keyword'] . "' = " . $price);
-						$this->query("INSERT INTO `" . DB_PREFIX . "product_discount` SET `product_id` = " . (int)$product_id . ", `quantity` = " . (float)$config_price_type['quantity'] . ", `priority` = " . (int)$config_price_type['priority'] . ", `customer_group_id` = " . (int)$config_price_type['customer_group_id'] . ", `price` = '" . (float)$price . "'");
+
+						if (!isset($old_price['price'])){
+							
+                                                        $this->query("INSERT INTO `" . DB_PREFIX . "product_discount` SET `product_id` = " . (int)$product_id . ", `quantity` = " . (float)$config_price_type['quantity'] . ", `priority` = " . (int)$config_price_type['priority'] . ", `customer_group_id` = " . (int)$config_price_type['customer_group_id'] . ", `price` = '" . (float)$price . "'");
+
+						}
 
 					} elseif ($config_price_type['table_price'] == 'special') {
 
