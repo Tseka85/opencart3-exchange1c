@@ -2315,7 +2315,7 @@ class ModelExtensionExchange1c extends Model {
 		$update_fields = $this->prepareQueryDescription($modify_fields, 'set');
 		//$this->log($update_fields, 2);
 		if ($update_fields) {
-			$this->query("UPDATE `" . DB_PREFIX . "product_description` SET " . $update_fields . " WHERE `product_id` = " . $product_id);
+			$this->query("UPDATE `" . DB_PREFIX . "product_description` SET " . $update_fields . " WHERE `product_id` = " . $product_id . " AND `language_id` = " . $this->LANG_ID);
 			$this->log("В таблице product_description обновлены поля: " . $update_fields);
 		}
 
@@ -2852,6 +2852,9 @@ class ModelExtensionExchange1c extends Model {
 	 * Читает реквизиты товара из XML в массив данных
 	 */
 	private function parseRequisite($xml, &$data) {
+        
+		if ($this->config->get('exchange1c_product_model_in_requisite_tag'))
+			$product_model_in_requisite_tag = $this->config->get('exchange1c_product_model_in_requisite_tag');
 
 		$this->log("Начато чтение реквизитов...", 2);
 		//$this->log($xml, 2);
@@ -2887,9 +2890,11 @@ class ModelExtensionExchange1c extends Model {
 						$this->log("> Реквизит: " . $name . " = " . $data['manufacturer_name'], 2);
 					}
 				break;
-				case 'Код':
-					$data['code'] = $this->parseCode($value);
-					$this->log("> Реквизит: " . $name . " преобразован в " . $data['code'], 2);
+				case $product_model_in_requisite_tag:
+					// $data['code'] = $this->parseCode($value);
+					// $this->log("> Реквизит: " . $name . " преобразован в " . $data['code'], 2);
+					$data['model'] = htmlspecialchars($value);
+					$this->log("> Реквизит: " . $name . " со значением " . $data['model'] . " записан в КОД товара", 2);
 				break;
 				case 'ISBN':
 					$data['isbn'] = htmlspecialchars($value);
@@ -4540,10 +4545,10 @@ class ModelExtensionExchange1c extends Model {
 				$this->parseRequisite($product->ЗначенияРеквизитов, $data);
 			}
 
-			// МОДЕЛЬ
-			if ($product->Модель) {
+			//МОДЕЛЬ
+			if ($product->Модель && $this->config->get('exchange1c_product_model_in_requisite') != 1) {
 				$data['model'] = htmlspecialchars(trim((string)$product->Модель));
-			} else {
+			} elseif ($product->Артикул && $this->config->get('exchange1c_product_model_in_requisite') != 1) {
 				$data['model'] = $product->Артикул ? htmlspecialchars(trim((string)$product->Артикул)) : "-";
 			}
 
@@ -4625,6 +4630,7 @@ class ModelExtensionExchange1c extends Model {
 
 			$this->log("Перед функцией setProduct()", 2);
 			$this->log($data, 2);
+			
 			// ЗАПИСЬ ТОВАРА
 			$product_id = $this->setProduct($data);
 			if ($this->ERROR) return false;

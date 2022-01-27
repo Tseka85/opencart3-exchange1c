@@ -783,6 +783,8 @@ class ControllerExtensionModuleExchange1c extends Controller {
 			,'product_description_no_import'			=> array('type' => 'radio')
 			,'product_manufacturer_no_import'			=> array('type' => 'radio')
 			,'product_manufacturer_tag'					=> array('type' => 'input')
+			,'product_model_in_requisite'			    => array('type' => 'radio')
+			,'product_model_in_requisite_tag'			=> array('type' => 'input')
 			,'product_taxes_no_import'					=> array('type' => 'radio', 'default' => 1)
 			,'product_category_no_import'				=> array('type' => 'radio')
 			,'product_disable_if_quantity_zero'			=> array('type' => 'radio')
