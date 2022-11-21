@@ -2100,6 +2100,13 @@ class ControllerExtensionModuleExchange1c extends Controller {
 			if (@mkdir($cache, 0755) === false) {
 				$result['error'] = "1005";
 			}
+		} else {
+            // Очищаем папку перед началом импорта
+		    $files = glob($cache.'/*');
+		    foreach($files as $file) {
+		        if(is_file($file))
+		            unlink($file);
+		    }
 		}
 
 		return $result;
