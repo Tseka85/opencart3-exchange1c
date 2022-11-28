@@ -4584,7 +4584,7 @@ class ModelExtensionExchange1c extends Model {
 			if ($product->Группы && $this->config->get('exchange1c_product_category_no_import') != 1) {
 				// Если надо обновлять категории товара
 				$data['categories']	= $this->parseProductCategories($product->Группы);
-				if (empty($data['categories'])) {
+				if (empty($data['categories']) && $this->config->get('exchange1c_category_root_no_create') != 1) {
 					$this->errorLog(2004);
 					return false;
 				}
@@ -7763,11 +7763,19 @@ class ModelExtensionExchange1c extends Model {
 					if ($this->config->get('exchange1c_category_new_no_create') == 1) {
 						$this->log("Включен запрет на создание новых категорий", 2);
 						continue;
+					    
+					} elseif ($num_categories == 1 && $this->config->get('exchange1c_category_root_no_create') == 1) {
+					    $this->log("Включен запрет на импорт корневой категории", 2);
+					    if ($xml_category->Группы) {
+					        $this->parseClassifierCategories($xml_category->Группы, $category_id, $num_categories);
+					        if ($this->ERROR) return false;
+					    }
+					    continue;
 
 					} else {
 
 						//$this->log($data, 2);
-						$category_id = $this->addCategory($data);
+					    $category_id = $this->addCategory($data);
 
 						$this->CATEGORIES[$guid] = array(
 							'category_id'	=> $category_id,
