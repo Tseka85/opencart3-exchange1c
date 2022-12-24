@@ -10,7 +10,8 @@ ini_set('max_execution_time', 900);
 // например
 //	define('VERSION', '3.0.3.8');
 // и выполняем её.
-eval(reset(preg_grep('/VERSION/', file('../index.php'))));
+$ar = preg_grep('/VERSION/', file('../index.php'));
+eval(reset($ar));
 
 // Configuration
 require_once('../admin/config.php');

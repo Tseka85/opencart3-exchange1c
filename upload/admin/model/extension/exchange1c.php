@@ -7682,7 +7682,7 @@ class ModelExtensionExchange1c extends Model {
 	 * ну и в дальнейшем нужны для формирования фильтров
 	 * Функция циклической обработки дерева категорий
 	 */
-	private function parseClassifierProductCategories($xml, $parent_id = 0, &$num_categories) {
+	private function parseClassifierProductCategories($xml, &$num_categories, $parent_id = 0) {
 		foreach ($xml->Категория as $xml_category) {
 			$num_categories++;
 			$guid = (string)$xml_category->Ид;
@@ -7717,7 +7717,7 @@ class ModelExtensionExchange1c extends Model {
 	 * update 2018-06-11
 	 * Парсит группы в классификаторе в XML
 	 */
-	private function parseClassifierCategories($xml, $parent_id = 0, &$num_categories) {
+	private function parseClassifierCategories($xml, &$num_categories, $parent_id = 0) {
 
 		foreach ($xml->Группа as $xml_category) {
 			if ($xml_category->Ид && $xml_category->Наименование) {
@@ -7767,7 +7767,7 @@ class ModelExtensionExchange1c extends Model {
 					} elseif ($num_categories == 1 && $this->config->get('exchange1c_category_root_no_create') == 1) {
 					    $this->log("Включен запрет на импорт корневой категории", 2);
 					    if ($xml_category->Группы) {
-					        $this->parseClassifierCategories($xml_category->Группы, $category_id, $num_categories);
+					        $this->parseClassifierCategories($xml_category->Группы, $num_categories, $category_id);
 					        if ($this->ERROR) return false;
 					    }
 					    continue;
@@ -7787,7 +7787,7 @@ class ModelExtensionExchange1c extends Model {
 			} // if ($xml_category->Ид && $xml_category->Наименование)
 
 			if ($xml_category->Группы) {
-				$this->parseClassifierCategories($xml_category->Группы, $category_id, $num_categories);
+				$this->parseClassifierCategories($xml_category->Группы, $num_categories, $category_id);
 				if ($this->ERROR) return false;
 			}
 
@@ -7859,7 +7859,7 @@ class ModelExtensionExchange1c extends Model {
 
 			$this->statStart('classifier_categories_parse');
 			$num_categories = 0;
-			$this->parseClassifierCategories($xml->Группы, 0, $num_categories);
+			$this->parseClassifierCategories($xml->Группы, $num_categories, 0);
 
 			// Удалим старые категории, которых нет в файле, если полная выгрузка
 			if ($this->FULL_IMPORT) {
@@ -7943,7 +7943,7 @@ class ModelExtensionExchange1c extends Model {
 			$this->log("~ТОВАРНЫЕ КАТЕГОРИИ");
 			$this->getProductCategories2();
 			$num_categories = 0;
-			$this->parseClassifierProductCategories($xml->Категории, 0, $num_categories);
+			$this->parseClassifierProductCategories($xml->Категории, $num_categories, 0);
 			if ($this->ERROR) return false;
 		}
 
