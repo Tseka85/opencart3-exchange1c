@@ -554,10 +554,10 @@ class ControllerExtensionModuleExchange1c extends Controller {
 			$this->log($data['order_date_export'], 2);
 		} else {
 			if ($this->config->get('exchange1c_order_date')) {
-				$data['order_date_export'] = strftime('%Y-%m-%dT%H:%M', strtotime($this->config->get('exchange1c_order_date')));
+				$data['order_date_export'] = $this->config->get('exchange1c_order_date');
 				$this->log($data['order_date_export'], 2);
 			} else {
-				$data['order_date_export'] = strftime('%Y-%m-%dT%H:%M', strtotime('2000-01-01 00:00:00'));
+				$data['order_date_export'] = '2000-01-01 00:00:00';
 				$this->log($data['order_date_export'], 2);
 			}
 		}
